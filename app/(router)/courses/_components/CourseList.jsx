@@ -11,7 +11,7 @@ import CourseItem from './CourseItem';
 
 function CourseList() {
 
-  const [courseList, setcourseList]=useState([]);
+  const [courseList, setCourseList]=useState([]);
     useEffect(()=>{
         getAllCourses();
     },[])
