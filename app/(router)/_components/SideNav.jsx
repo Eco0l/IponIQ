@@ -26,7 +26,7 @@ function SideNav() {
         },
         {
             id:2,
-            name:'Avatar',
+            name:'Daily Quiz',
             icon:UserIcon,
             path:'/profile',
             auth: user

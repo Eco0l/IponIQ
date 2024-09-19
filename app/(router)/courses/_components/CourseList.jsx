@@ -1,3 +1,4 @@
+"use client"
 import GlobalAPI from '@/app/_utils/GlobalAPI'
 import React, { useEffect, useState } from 'react'
 import {
@@ -40,7 +41,7 @@ function CourseList() {
 
         </div>
         {/*Display Courselist */} 
-        <div>
+        <div className='grid grid-cols-2 lg:grid-cols-3 gap-3 mt-4'>
           {courseList.map((item,index)=>(
             <div key={index}>
                 <CourseItem course={item}/>

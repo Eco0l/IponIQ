@@ -5,20 +5,20 @@ const MASTER_URL="https://api-ap-northeast-1.hygraph.com/v2/"+process.env.NEXT_P
 
 const getAllCourseList=async()=>{
   const query=gql `
-  query Assets {
+  query MyQuery {
   courseLists {
-    description
-    id
     name
-    publishedAt
+    id
+    description
     totalChapters
-    chapter {
-      ... on Chapter {
-        id
-      }
+    gameLink
+    banner {
+      id
+      url
     }
   }
 }
+
   `
 
   const result=await request(MASTER_URL, query);
