@@ -1,25 +1,27 @@
 "use client"
 import React from 'react'
 import { useUser } from '@clerk/nextjs';
-import WelcomeBannerStore from './_components/WelcomeBannerStore';
+import WelcomeBannerQuiz from './_components/WelcomeBannerQuiz';
+import Leaderboard from './_components/Leaderboard';
 
 
-function Dashboard() {
-  
+
+function QuizGame() {
+  const{user}=useUser();
   return (
     <div className='grid grid-cols-1 md:grid-cols-3 p-5'>
       {/*Left Container */}
       <div className='col-span-2'>
-        <WelcomeBannerStore/>
+        <WelcomeBannerQuiz user={user}/>
 
 
       </div>
       {/*Right Container */} 
       <div>
-      Right Section
+      <Leaderboard />
       </div>
     </div>
   )
 }
 
-export default Dashboard
+export default QuizGame

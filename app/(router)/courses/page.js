@@ -2,6 +2,7 @@
 import React from 'react'
 import WelcomeBanner from './_components/WelcomeBanner'
 import CourseList from './_components/CourseList'
+import Leaderboard from '../QuizGame/_components/Leaderboard'
 
 function Courses() {
   return (
@@ -16,7 +17,7 @@ function Courses() {
       </div>
       {/*Right Container */} 
       <div>
-      Right Section
+      <Leaderboard />
       </div>
     </div>
   )

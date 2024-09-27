@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect } from 'react'
-import { BicepsFlexedIcon, BookOpen, CircleHelpIcon, LayoutDashboard, Store, UserIcon } from 'lucide-react'
+import { BicepsFlexedIcon, BookOpen, CircleHelpIcon, LayoutDashboard, Notebook, Play, Store, UserIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useUser } from '@clerk/nextjs'
 import { usePathname } from 'next/navigation';
@@ -26,9 +26,9 @@ function SideNav() {
         },
         {
             id:2,
-            name:'Daily Quiz',
-            icon:UserIcon,
-            path:'/profile',
+            name:'QuizGames',
+            icon:Play,
+            path:'/QuizGame',
             auth: user
         },
         {
@@ -38,12 +38,7 @@ function SideNav() {
             path:'/quest',
             auth: user
         },
-           {id:4, 
-            name: 'Store',
-            icon: Store,
-            path: '/store',
-            auth: user
-           }
+           
     ]
     const path=usePathname();
     useEffect(()=>{

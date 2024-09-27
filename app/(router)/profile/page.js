@@ -2,6 +2,7 @@
 import React from 'react'
 import { useUser } from '@clerk/nextjs';
 import WelcomeBannerProfile from './_components/WelcomeBannerProfile';
+import Leaderboard from '../QuizGame/_components/Leaderboard';
 
 
 function Dashboard() {
@@ -16,7 +17,7 @@ function Dashboard() {
       </div>
       {/*Right Container */} 
       <div>
-      Right Section
+      <Leaderboard />
       </div>
     </div>
   )
