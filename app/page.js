@@ -16,17 +16,28 @@ export default function Home() {
         try {
           // Reference to Firestore document in 'Users' collection with a specific user ID
           const userRef = doc(db, "Users", user.id);
+          const leaderboardRef = doc(db, "Leaderboards", user.id); // Reference to 'Leaderboards' collection
 
-          // Save the Clerk user info into Firestore
-          await setDoc(userRef, {
+          // Data to save
+          const userData = {
             user_email: user.primaryEmailAddress?.emailAddress || "",
             user_fname: user.firstName || "",
             user_lname: user.lastName || "",
-            user_nname: user.username || "", // Added nickname
+            user_nname: user.username || "",
             user_id: user.id,
+          };
+
+          // Save the Clerk user info into Firestore 'Users' collection
+          await setDoc(userRef, userData);
+
+          // Save the same data into 'Leaderboards' collection
+          await setDoc(leaderboardRef, {
+            user_id: userData.user_id,
+            user_fname: userData.user_fname,
+            score: 0, // Initialize a score or any other leaderboard-specific field
           });
 
-          console.log("User info saved to Firestore!");
+          console.log("User info saved to Firestore and Leaderboards!");
           router.push("/dashboard"); // Redirect to dashboard after saving info
         } catch (error) {
           console.error("Error saving user info to Firestore:", error);

@@ -3,6 +3,7 @@ import React from 'react'
 import { useUser } from '@clerk/nextjs';
 import WelcomeBannerQuiz from './_components/WelcomeBannerQuiz';
 import Leaderboard from './_components/Leaderboard';
+import QuizList from './_components/QuizList';
 
 
 
@@ -14,7 +15,7 @@ function QuizGame() {
       <div className='col-span-2'>
         <WelcomeBannerQuiz user={user}/>
 
-
+        <QuizList />
       </div>
       {/*Right Container */} 
       <div>

@@ -10,14 +10,13 @@ const getAllCourseList=async()=>{
     name
     id
     description
-    totalChapters
-    gameLink
     banner {
       id
       url
     }
   }
 }
+
 
   `
 

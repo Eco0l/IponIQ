@@ -11,7 +11,7 @@ function Header() {
     <div className='=p-4 bg-white flex justify-between '>
         {/*Search bar*/}
 
-        <div className='flex gap-2 border p-2 rounded-md '>
+        <div className='flex gap-2 border p-2 rounded-sm '>
             <Search/>
             <input type="text" placeholder='Search...' className='outline-none'/>
         </div>
