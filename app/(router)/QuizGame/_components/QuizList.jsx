@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
 import QuizAPI from '@/app/_utils/QuizAPI';
 import {
@@ -9,10 +9,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import QuizItem from './QuizItem'; // Ensure this component is defined
+import Modal from './Modal'; // Import the modal
+import QuizGame from './QuizGame'; // Import the quiz game
 
 function QuizList() {
   const [quizList, setQuizList] = useState([]);
   const [filter, setFilter] = useState('all');
+  const [selectedQuizId, setSelectedQuizId] = useState(null); // Track selected quiz ID
+  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal open/close
 
   useEffect(() => {
     fetchAllQuizzes();
@@ -21,8 +25,7 @@ function QuizList() {
   const fetchAllQuizzes = async () => {
     try {
       const resp = await QuizAPI.getAllQuiz();
-      console.log('Fetched Quizzes:', resp); // Inspect the fetched data
-      setQuizList(resp.quizzes || []); // Set quizList directly from the response
+      setQuizList(resp.quizzes || []);
     } catch (error) {
       console.error('Error fetching quizzes:', error);
       setQuizList([]);
@@ -35,8 +38,18 @@ function QuizList() {
 
   const filteredQuizzes = quizList.filter((quiz) => {
     if (filter === 'all') return true;
-    return quiz.status === filter; // Ensure quizzes have a 'status' property; adjust if necessary
+    return quiz.status === filter;
   });
+
+  const handleQuizClick = (quizId) => {
+    setSelectedQuizId(quizId);
+    setIsModalOpen(true); // Open the modal when a quiz is clicked
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedQuizId(null); // Reset selected quiz ID when closing modal
+  };
 
   return (
     <div className="p-5 bg-white rounded-lg mt-3">
@@ -56,10 +69,17 @@ function QuizList() {
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
         {filteredQuizzes.map((quiz, index) => (
           <div key={index}>
-            <QuizItem quiz={quiz} /> {/* Pass quiz with only the name */}
+            <QuizItem quiz={quiz} onClick={handleQuizClick} /> {/* Pass quizId to QuizItem */}
           </div>
         ))}
       </div>
+
+      {/* Modal for Quiz Game */}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        {selectedQuizId && (
+          <QuizGame quizId={selectedQuizId} onClose={handleCloseModal} /> 
+        )}
+      </Modal>
     </div>
   );
 }
