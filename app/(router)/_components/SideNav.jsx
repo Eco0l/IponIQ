@@ -13,7 +13,7 @@ function SideNav() {
   const menu = [
     {
       id: 8,
-      name: 'DashBoard',
+      name: 'Dashboard',
       icon: LayoutDashboard,
       path: '/dashboard',
       auth: user,
@@ -54,41 +54,41 @@ function SideNav() {
   return (
     <div>
       {/* Burger Menu for Small Screens */}
-      <div className="p-4 bg-white shadow-sm border md:hidden flex justify-between items-center">
+      <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 shadow-md border-b md:hidden flex justify-between items-center">
         <Image src="/logo.svg" alt="logo" width={120} height={60} />
-        <button onClick={toggleMenu} className="text-gray-500 focus:outline-none">
-          {isOpen ? <X size={28} /> : <Menu size={28} />} {/* Show X when open, burger when closed */}
+        <button onClick={toggleMenu} className="text-white focus:outline-none">
+          {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
       {/* Sidebar for larger screens and toggled for small screens */}
       <div
-        className={`p-5 bg-white shadow-sm border h-screen md:block ${
+        className={`p-5 bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg h-screen md:block ${
           isOpen ? 'block' : 'hidden'
         } md:relative fixed top-0 left-0 w-[250px] z-50`}
       >
         {/* Close Button inside Sidebar (for mobile view) */}
         <div className="flex justify-between items-center mb-6">
           <Image src="/logo.svg" alt="logo" width={170} height={80} />
-          <button onClick={toggleMenu} className="md:hidden text-gray-500">
-            <X size={28} /> {/* Close icon for closing the sidebar */}
+          <button onClick={toggleMenu} className="md:hidden text-white">
+            <X size={28} />
           </button>
         </div>
 
-        <hr className="mt-7" />
+        <hr className="border-gray-300 mb-6" />
 
         {/* Menu List */}
-        <div className="mt-8">
+        <div className="mt-8 space-y-4">
           {menu.map(
             (item, index) =>
               item.auth && (
                 <Link href={item.path} key={index}>
                   <div
-                    className="flex gap-3 mt-2 p-3 text-[18px] items-center
-                text-gray-500 cursor-pointer hover:bg-primary hover:text-white 
-                rounded-md transition-all ease-in-out duration-200"
+                    className={`flex gap-3 items-center p-3 text-lg cursor-pointer 
+                    hover:bg-purple-700 hover:text-white rounded-md transition-all ease-in-out duration-200 
+                    ${path === item.path ? 'bg-purple-700 text-white' : 'text-white'}`}
                   >
-                    <item.icon />
+                    <item.icon className="w-6 h-6" />
                     <h2>{item.name}</h2>
                   </div>
                 </Link>

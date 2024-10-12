@@ -5,7 +5,7 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { motion } from 'framer-motion'; // For smooth animations
 import { db } from '@/firebaseConfig';
-import { getFirestore, collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useUser } from '@clerk/nextjs';
 
 function QuizGame({ quizId, onClose }) {
@@ -14,27 +14,45 @@ function QuizGame({ quizId, onClose }) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0); // Track correct answers
+  const [incorrectAnswers, setIncorrectAnswers] = useState(0); // Track incorrect answers
   const [timeLeft, setTimeLeft] = useState(30); // Timer for each question
   const [loading, setLoading] = useState(true); // Track loading state
   const [error, setError] = useState(null); // Track errors
   const [isGameOver, setIsGameOver] = useState(false); // Track if game is over
-  const storeScoreInFirestore = async (userId, quizId, score ) => {
+  const [canAttemptQuiz, setCanAttemptQuiz] = useState(true); // Track if user can take the quiz
+  const [hasAttemptedBefore, setHasAttemptedBefore] = useState(false); // Track if user has already taken quiz
+
+  // Function to store the score and completion time in Firestore (only for the first attempt)
+  const storeScoreInFirestore = async (userId, quizId, score) => {
     try {
-      const scoreRef = doc(db, 'quiz_scores', `${userId}_${quizId}`);
-      await setDoc(scoreRef, {
-        userId: userId,
-        quizId: quizId,
-        score: score,
-        timestamp: serverTimestamp(), // Correct use of serverTimestamp
-        user_fname: user.firstName || ""
-      });
-      console.log('Score successfully stored in Firestore');
+      if (!hasAttemptedBefore) {
+        const scoreRef = doc(db, 'quiz_scores', `${userId}_${quizId}`);
+        await setDoc(scoreRef, {
+          userId: userId,
+          quizId: quizId,
+          score: score,
+          timestamp: serverTimestamp(),
+          user_fname: user.firstName || "",
+        });
+        console.log('Score successfully stored in Firestore');
+        setHasAttemptedBefore(true); // Mark that the user has attempted the quiz for leaderboard purposes
+      }
     } catch (error) {
       console.error('Error storing score:', error);
     }
   };
 
-  
+  // Function to check if the user has already taken the quiz before
+  const checkQuizEligibility = async () => {
+    const scoreRef = doc(db, 'quiz_scores', `${userId}_${quizId}`);
+    const scoreSnap = await getDoc(scoreRef);
+
+    if (scoreSnap.exists()) {
+      setHasAttemptedBefore(true); // User has already taken this quiz
+    }
+  };
+
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
@@ -54,8 +72,12 @@ function QuizGame({ quizId, onClose }) {
       }
     };
 
+    if (userId) {
+      checkQuizEligibility(); // Check if the user can take the quiz
+    }
+
     fetchQuizData();
-  }, [quizId]);
+  }, [quizId, userId]);
 
   useEffect(() => {
     if (timeLeft > 0 && !isGameOver) {
@@ -71,8 +93,11 @@ function QuizGame({ quizId, onClose }) {
     if (currentQuestion) {
       const correctAnswer = currentQuestion.correctAnswer;
       if (selectedAnswer === correctAnswer) {
+        setCorrectAnswers(correctAnswers + 1);
         const timeBonus = timeLeft * 10; // Faster response, higher score
         setScore(score + 100 + timeBonus);
+      } else {
+        setIncorrectAnswers(incorrectAnswers + 1);
       }
 
       // Move to the next question or end the game
@@ -88,6 +113,8 @@ function QuizGame({ quizId, onClose }) {
   const handleRetry = () => {
     setCurrentQuestionIndex(0);
     setScore(0);
+    setCorrectAnswers(0);
+    setIncorrectAnswers(0);
     setTimeLeft(30);
     setIsGameOver(false);
   };
@@ -99,11 +126,14 @@ function QuizGame({ quizId, onClose }) {
   const currentQuestion = questions[currentQuestionIndex];
 
   if (isGameOver) {
-    storeScoreInFirestore(userId, quizId, score); // Assuming you have access to `userId` and `quizId`
+    storeScoreInFirestore(userId, quizId, score); // Store the score only for the first attempt
+
     return (
       <div className="p-5">
         <h2 className="text-lg font-bold mb-3">Quiz Complete!</h2>
         <p>Your final score: {score}</p>
+        <p>Correct answers: {correctAnswers}</p>
+        <p>Incorrect answers: {incorrectAnswers}</p>
 
         <div className="mt-4">
           <button onClick={handleRetry} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
@@ -124,7 +154,7 @@ function QuizGame({ quizId, onClose }) {
       {/* Display question */}
       {currentQuestion && currentQuestion.questionText ? (
         <motion.div
-          key={currentQuestion.questionId} // Make sure questionId exists before using it
+          key={currentQuestion.questionId}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}

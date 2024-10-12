@@ -25,15 +25,15 @@ function CourseList() {
   };
 
   return (
-    <div className='p-5 bg-white rounded-lg mt-3'>
+    <div className='p-5 bg-gradient-to-r from-purple-50 via-white to-purple-100 rounded-lg mt-3 shadow-lg'>
       {/* Title and Filter */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-3">
-        <h2 className='text-[20px] font-bold text-blue-500'>All Courses</h2>
+        <h2 className='text-[22px] font-bold text-purple-600'>All Courses</h2>
         <Select>
-          <SelectTrigger className="w-full sm:w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px] border-purple-500">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-purple-100">
             <SelectItem value="new">New</SelectItem>
             <SelectItem value="unfinished">Unfinished</SelectItem>
             <SelectItem value="finished">Finished</SelectItem>
@@ -41,8 +41,8 @@ function CourseList() {
         </Select>
       </div>
 
-      {/* Display Courselist */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4'>
+      {/* Display Course List */}
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6'>
         {courseList.map((item, index) => (
           <div key={index}>
             <CourseItem course={item} />

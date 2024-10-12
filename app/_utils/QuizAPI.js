@@ -12,6 +12,7 @@ const getAllQuiz = async () => {
       url
       id
     }
+    diff
   }
   questions {
     questionText
@@ -20,6 +21,7 @@ const getAllQuiz = async () => {
     questionId
   }
 }
+
 
 
 
