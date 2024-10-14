@@ -16,15 +16,15 @@ function QuizGame({ quizId, onClose }) {
   const [score, setScore] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0); // Track correct answers
   const [incorrectAnswers, setIncorrectAnswers] = useState(0); // Track incorrect answers
-  const [timeLeft, setTimeLeft] = useState(30); // Timer for each question
+  const [timeLeft, setTimeLeft] = useState(20); // Timer for each question set to 20 seconds
   const [loading, setLoading] = useState(true); // Track loading state
   const [error, setError] = useState(null); // Track errors
   const [isGameOver, setIsGameOver] = useState(false); // Track if game is over
   const [canAttemptQuiz, setCanAttemptQuiz] = useState(true); // Track if user can take the quiz
   const [hasAttemptedBefore, setHasAttemptedBefore] = useState(false); // Track if user has already taken quiz
 
-  // Function to store the score and completion time in Firestore (only for the first attempt)
-  const storeScoreInFirestore = async (userId, quizId, score) => {
+  // Function to store the score and correct answers on the first attempt in Firestore
+  const storeScoreInFirestore = async (userId, quizId, score, correctAnswers) => {
     try {
       if (!hasAttemptedBefore) {
         const scoreRef = doc(db, 'quiz_scores', `${userId}_${quizId}`);
@@ -32,10 +32,11 @@ function QuizGame({ quizId, onClose }) {
           userId: userId,
           quizId: quizId,
           score: score,
+          correctAnswers: correctAnswers, // Store the number of correct answers
           timestamp: serverTimestamp(),
           user_fname: user.firstName || "",
         });
-        console.log('Score successfully stored in Firestore');
+        console.log('Score and correct answers successfully stored in Firestore');
         setHasAttemptedBefore(true); // Mark that the user has attempted the quiz for leaderboard purposes
       }
     } catch (error) {
@@ -84,9 +85,14 @@ function QuizGame({ quizId, onClose }) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && !isGameOver) {
-      setIsGameOver(true); // End the game if time runs out
+      if (currentQuestionIndex + 1 < questions.length) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1); // Move to the next question
+        setTimeLeft(20); // Reset timer for the next question
+      } else {
+        setIsGameOver(true); // End the game after all questions
+      }
     }
-  }, [timeLeft, isGameOver]);
+  }, [timeLeft, isGameOver, currentQuestionIndex, questions]);
 
   const handleAnswer = (selectedAnswer) => {
     const currentQuestion = questions[currentQuestionIndex];
@@ -103,7 +109,7 @@ function QuizGame({ quizId, onClose }) {
       // Move to the next question or end the game
       if (currentQuestionIndex + 1 < questions.length) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
-        setTimeLeft(30); // Reset timer for the next question
+        setTimeLeft(20); // Reset timer for the next question
       } else {
         setIsGameOver(true); // End the game after 10 questions
       }
@@ -115,7 +121,7 @@ function QuizGame({ quizId, onClose }) {
     setScore(0);
     setCorrectAnswers(0);
     setIncorrectAnswers(0);
-    setTimeLeft(30);
+    setTimeLeft(20);
     setIsGameOver(false);
   };
 
@@ -126,7 +132,7 @@ function QuizGame({ quizId, onClose }) {
   const currentQuestion = questions[currentQuestionIndex];
 
   if (isGameOver) {
-    storeScoreInFirestore(userId, quizId, score); // Store the score only for the first attempt
+    storeScoreInFirestore(userId, quizId, score, correctAnswers); // Store the score and correct answers only for the first attempt
 
     return (
       <div className="p-5">
@@ -188,11 +194,11 @@ function QuizGame({ quizId, onClose }) {
             <div style={{ width: 100, height: 100, margin: '0 auto' }}>
               <CircularProgressbar
                 value={timeLeft}
-                maxValue={30}
+                maxValue={20}
                 text={`${timeLeft}s`}
                 styles={buildStyles({
                   textColor: '#000',
-                  pathColor: `rgba(62, 152, 199, ${timeLeft / 30})`,
+                  pathColor: `rgba(62, 152, 199, ${timeLeft / 20})`,
                   trailColor: '#d6d6d6',
                 })}
               />

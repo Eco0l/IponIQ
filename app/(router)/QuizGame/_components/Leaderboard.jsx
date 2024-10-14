@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { collection, query, orderBy, limit, where, getDocs } from "firebase/firestore";
-import { db } from "@/firebaseConfig"; // Import your Firebase config
+import { db } from "@/firebaseConfig"; // Import Firebase config
 import { motion } from "framer-motion"; // For smooth animations
 import QuizAPI from "@/app/_utils/QuizAPI"; // Assuming you have an API utility for fetching quizzes
 import { ChevronLeft, ChevronRight, Award, User } from "lucide-react"; // Lucide Icons
@@ -15,10 +15,9 @@ function Leaderboards() {
   useEffect(() => {
     const fetchLeaderboardData = async () => {
       try {
-        // Fetch quiz details from Hygraph (quizId and quizName)
         const response = await QuizAPI.getAllQuiz();
-        const quizzes = response.quizzes; // Assuming quizzes include quizId and quizName
-        setQuizDetails(quizzes); // Store quizId and quizName for each quiz
+        const quizzes = response.quizzes;
+        setQuizDetails(quizzes);
 
         const leaderboardData = [];
 
@@ -28,7 +27,7 @@ function Leaderboards() {
             collection(db, "quiz_scores"),
             where("quizId", "==", quiz.quizId),
             orderBy("score", "desc"),
-            limit(5) // Get top 5 scorers per quiz
+            limit(3) // Limit to top 3 scorers per quiz
           );
           const scoresSnapshot = await getDocs(quizScoresQuery);
           const topScores = scoresSnapshot.docs.map((doc) => doc.data());
@@ -69,38 +68,44 @@ function Leaderboards() {
   }
 
   return (
-    <div className="p-5 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-center mb-6 text-indigo-600">
-        Leaderboards <Award className="inline ml-2" size={24} />
+    <div className="p-6 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg shadow-lg">
+      <h2 className="text-3xl font-extrabold text-center mb-8 text-indigo-700 flex items-center justify-center">
+        Leaderboards <Award className="inline ml-3" size={28} />
       </h2>
 
       {currentLeaderboard ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
           key={currentLeaderboard.quizId}
         >
-          <h3 className="text-xl font-semibold text-indigo-500 mb-4 text-center">
+          <h3 className="text-2xl font-bold text-indigo-600 mb-6 text-center">
             {currentLeaderboard.quizName}
           </h3>
 
-          <table className="table-auto w-full text-left border-separate border-spacing-2">
+          <table className="table-auto w-full text-left">
             <thead>
-              <tr className="bg-indigo-100 text-indigo-800">
-                <th className="px-4 py-2">Rank</th>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2">Score</th>
+              <tr className="bg-indigo-300 text-indigo-900">
+                <th className="px-4 py-3 font-bold">Rank</th>
+                <th className="px-4 py-3 font-bold">Name</th>
+                <th className="px-4 py-3 font-bold">Score</th>
               </tr>
             </thead>
             <tbody>
               {currentLeaderboard.topScores.map((scoreData, index) => (
-                <tr key={index} className="bg-white border-b">
-                  <td className="px-4 py-2 font-semibold">{index + 1}</td>
-                  <td className="px-4 py-2 flex items-center gap-2">
-                    <User className="text-indigo-500" size={20} /> {scoreData.user_fname}
+                <tr
+                  key={index}
+                  className={`${
+                    index % 2 === 0 ? "bg-indigo-100" : "bg-indigo-50"
+                  } hover:bg-indigo-200 transition-all`}
+                >
+                  <td className="px-4 py-3 font-semibold">{index + 1}</td>
+                  <td className="px-4 py-3 flex items-center gap-3">
+                    <User className="text-indigo-600" size={22} />
+                    {scoreData.user_fname}
                   </td>
-                  <td className="px-4 py-2 text-indigo-600 font-semibold">{scoreData.score}</td>
+                  <td className="px-4 py-3 text-indigo-700 font-semibold">{scoreData.score}</td>
                 </tr>
               ))}
             </tbody>
@@ -111,20 +116,20 @@ function Leaderboards() {
       )}
 
       {/* Slider Controls */}
-      <div className="flex justify-between items-center mt-6">
+      <div className="flex justify-between items-center mt-10">
         <button
           onClick={handlePrev}
-          className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition"
+          className="flex items-center bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700 transition transform hover:scale-105"
         >
-          <ChevronLeft size={20} className="mr-2" />
+          <ChevronLeft size={24} className="mr-2" />
           Previous Quiz
         </button>
         <button
           onClick={handleNext}
-          className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition"
+          className="flex items-center bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700 transition transform hover:scale-105"
         >
           Next Quiz
-          <ChevronRight size={20} className="ml-2" />
+          <ChevronRight size={24} className="ml-2" />
         </button>
       </div>
     </div>
